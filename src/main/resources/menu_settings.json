@@ -1,0 +1,7 @@
+{
+  "punishmentsInRow":1,
+  "rulesInColumn":5,
+  "useEntityAction":false,
+  "chatsAction":true,
+  "stopChatOnFocus":true
+}

@@ -1,0 +1,8 @@
+{
+  "replaciests": [
+    {
+      "pattern": "<3",
+      "toReplace": "❤"
+    }
+  ]
+}
