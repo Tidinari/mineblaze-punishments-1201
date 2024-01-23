@@ -17,47 +17,52 @@ class Rule(private val name: String, private val description: String, private va
 
     fun display(root: FlowLayout, violator: Violator, punishmentsInARow: Int = 2, showDesc: (String, String) -> Unit) {
         root.children(
-            listOf(
-                nameAndButtonsComponent(violator, punishmentsInARow, showDesc),
-            )
+                listOf(
+                        nameAndButtonsComponent(violator, punishmentsInARow, showDesc),
+                )
         )
     }
 
     private fun nameAndButtonsComponent(violator: Violator, punishmentsInARow: Int = 2, showDesc: (String, String) -> Unit) = Containers
-        .horizontalFlow(Sizing.content(), Sizing.content())
-        .apply {
-            verticalAlignment(VerticalAlignment.CENTER)
-            margins(Insets.bottom(7))
-            if (punishments.size > punishmentsInARow) {
-                child(nameComp(showDesc))
-                child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                    var rowContainer = constructPunishmentRow()
-                    child(rowContainer)
-                    for ((index, punishment) in punishments.withIndex()) {
-                        if (index != 0 && index % punishmentsInARow == 0) {
-                            rowContainer = constructPunishmentRow()
-                            child(rowContainer)
+            .horizontalFlow(Sizing.content(), Sizing.content())
+            .apply {
+                verticalAlignment(VerticalAlignment.CENTER)
+                margins(Insets.bottom(7))
+                if (punishments.size > punishmentsInARow) {
+                    child(nameComp(showDesc))
+                    child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                        alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
+                        var rowContainer = constructPunishmentRow()
+                        child(rowContainer)
+                        for ((index, punishment) in punishments.withIndex()) {
+                            if (index != 0 && index % punishmentsInARow == 0) {
+                                rowContainer = constructPunishmentRow()
+                                child(rowContainer)
+                            }
+                            rowContainer.child(punishment.component(violator))
                         }
-                        rowContainer.child(punishment.component(violator))
+                    })
+                } else {
+                    child(nameComp(showDesc))
+                    for (punish in punishments) {
+                        child(punish.component(violator))
                     }
-                })
-            } else {
-                child(nameComp(showDesc))
-                for (punish in punishments) {
-                    child(punish.component(violator))
                 }
             }
-        }
 
     private fun constructPunishmentRow(): FlowLayout {
         return Containers.horizontalFlow(Sizing.content(), Sizing.content())
-            .apply { alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER) }
+                .apply { alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER) }
     }
 
-    fun nameComp(showDesc: (String, String) -> Unit) = Components
-        .label(Text.literal(name))
-        .margins(Insets.left(7).withRight(3))
+    private fun nameComp(showDesc: (String, String) -> Unit) = Components
+            .label(Text.literal(name)).apply {
+                textClickHandler {
+                    showDesc(name, description)
+                    return@textClickHandler true
+                }
+                margins(Insets.left(7).withRight(3))
+            }
 
     fun asEditable(): EditableRule {
         return EditableRule(name, description, punishments)
@@ -85,48 +90,48 @@ class EditableRule(name: String, description: String, punishments: List<Punishme
 
     fun display(root: FlowLayout, index: Int, onUp: () -> Unit, onDown: () -> Unit, onAddingPunishment: () -> Unit) {
         root.child(
-            nameAndButtonsComponent(index, onUp, onDown, onAddingPunishment),
+                nameAndButtonsComponent(index, onUp, onDown, onAddingPunishment),
         )
         descBox.display(root)
     }
 
     private fun nameAndButtonsComponent(index: Int, onUp: () -> Unit, onDown: () -> Unit, onAddingPunishment: () -> Unit) = Containers
-        .horizontalFlow(Sizing.content(), Sizing.content())
-        .apply {
-            verticalAlignment(VerticalAlignment.CENTER)
-            margins(Insets.bottom(2))
-            child(
-                Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                }.children(listOf(
-                    Components.button(Text.literal("⇧")) { onUp() }.apply {
-                        if (index == 0) this.active(false)
-                    },
-                    Components.label(Text.literal(index.toString())),
-                    Components.button(Text.literal("⇩")) { onDown() }.apply {  }
-                ))
-            )
-            nameBox.display(this)
-            if (punishments.size > 0) {
-                child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                    for (punishment in punishments) {
-                        punishment.display(this)
-                    }
-                })
-            }
-            child(Components.button(Text.literal("✚")) {
-                try {
-                    if (punishments.last().isNotBlank()) {
+            .horizontalFlow(Sizing.content(), Sizing.content())
+            .apply {
+                verticalAlignment(VerticalAlignment.CENTER)
+                margins(Insets.bottom(2))
+                child(
+                        Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                            alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
+                        }.children(listOf(
+                                Components.button(Text.literal("⇧")) { onUp() }.apply {
+                                    if (index == 0) this.active(false)
+                                },
+                                Components.label(Text.literal(index.toString())),
+                                Components.button(Text.literal("⇩")) { onDown() }.apply { }
+                        ))
+                )
+                nameBox.display(this)
+                if (punishments.size > 0) {
+                    child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                        alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
+                        for (punishment in punishments) {
+                            punishment.display(this)
+                        }
+                    })
+                }
+                child(Components.button(Text.literal("✚")) {
+                    try {
+                        if (punishments.last().isNotBlank()) {
+                            punishments.add(Punishment("", "").asEditable())
+                            onAddingPunishment()
+                        }
+                    } catch (_: NoSuchElementException) {
                         punishments.add(Punishment("", "").asEditable())
                         onAddingPunishment()
                     }
-                } catch (_: NoSuchElementException) {
-                    punishments.add(Punishment("", "").asEditable())
-                    onAddingPunishment()
-                }
-            })
-        }
+                })
+            }
 
     fun isNotBlank(): Boolean {
         clearBlankPunishments()
