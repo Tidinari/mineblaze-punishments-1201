@@ -46,112 +46,131 @@ object MineBlazePunishments : ModInitializer {
         PunishCommand(rulesFileSource, settingsFileSource).registerCommand()
         RealNameAliasCommand().registerCommand()
         SendChatCommand().registerCommand()
-
         ClientReceiveMessageEvents.MODIFY_GAME.register(
-            ClientReceiveMessageEvents.ModifyGame { fullMessage, _ ->
-                if (!settingsFileSource.read().chatsAction) return@ModifyGame fullMessage
-
-                val siblings = fullMessage.siblings
-                if (isAModerCommand(siblings)) {
-                    val violator = siblings[4].string.trim() // Ник наказавшего
-                    val nick = siblings[6].string.trim() // Ник потерпевшего
-                    val punishment = siblings[5].string.trim() // Наказание
-                    if (punishment.startsWith("кикнул")) {
-                        addPunishToMessage(siblings, nick)
-                    } else {
-                        addPunishToMessage(siblings, nick, "§e[П]§r")
-                        if (punishment.startsWith("забанил")) {
-                            addUnToMessage(siblings, "/unban $nick", "Разбанить §c$nick")
-                        } else if (punishment.startsWith("замутил")) {
-                            addUnToMessage(siblings, "/unmute $nick", "Размутить §c$nick")
-                        } else if (punishment.startsWith("выдал предупреждение")) {
-                            addUnToMessage(siblings, "/unwarn $nick", "Разварнить §c$nick")
-                        }
-                        addPunishToMessage(siblings, violator)
-                    }
-                } else if (isANearMessage(siblings)) {
-                    val nicks = siblings.subList(3, siblings.size).map { it.string }
-                    var nick = ""
-                    var dropMeters = false
-                    var nextDrop = false
-                    var offside = 3
-                    for ((index, str) in nicks.withIndex()) {
-                        if (str == "(") {
-                            if (nick.startsWith("~~")) {
-                                addRealNameMessage(siblings, "/realname $nick", "Реальный ник $nick", index = index + offside)
-                                offside++
-                            } else {
-                                addPunishToMessage(siblings, nick, index = index + offside)
-                                offside++
+                ClientReceiveMessageEvents.ModifyGame { message, _ ->
+                    if (message.string.contains("§x")) {
+                        message.siblings.forEach {
+                            if (it.string.contains("§x")) {
+                                it.siblings.replaceAll { text ->
+                                    if (text.string.contains("§x")) {
+                                        return@replaceAll Text.literal(text.string.replace("§x", ""))
+                                    }
+                                    if (text.string.contains("§")) {
+                                        return@replaceAll Text.literal(text.string.replace("§", ""))
+                                    }
+                                    text
+                                }
                             }
-                            nick = ""
-                            dropMeters = true
-                        } else if (dropMeters) {
-                            nextDrop = true
-                            dropMeters = false
-                            continue
-                        } else if (nextDrop) {
-                            nick = str.drop(3)
-                            nextDrop = false
-                        } else {
-                            nick += if (index == 0) str.trim() else str
                         }
                     }
-                } else if (isAJailCommand(siblings)) {
-                    val nick = siblings[4].string.trim() // Пострадавший
-                    addPunishToMessage(siblings, siblings[2].string.trim())
-                    addUnToMessage(siblings, "/jail free $nick", "Разджеилить $nick")
-                    addPunishToMessage(siblings, nick, "§e[П]§r")
-                } else if (isAnAFKMessage(siblings)) {
-                    if (siblings[2].string.startsWith("~~")) {
-                        val notRealName = siblings.subList(2, siblings.size - 1)
-                            .joinToString("") { it.string }.removePrefix("~~")
-                        addRealNameMessage(siblings, "/realname $notRealName", "Реальный ник $notRealName")
-                    } else {
-                        val realName = siblings[2].string.trim()
-                        addPunishToMessage(siblings, realName)
-                    }
-                } else if (isASocialSpy(siblings)) {
-                    if (siblings[8].string.startsWith("~~")) {
-                        val notRealName = siblings.subList(8, siblings.map { it.string }.indexOf(" -> "))
-                            .joinToString("") { it.string }.removePrefix("~~")
-                        addRealNameMessage(siblings, "/realname $notRealName", "Реальный ник $notRealName")
-                    } else {
-                        val name = siblings[8].string
-                        addPunishToMessage(siblings, name)
-                    }
-                } else if (isAPrivateMessage(siblings)) {
-                    if (siblings[3].string.startsWith("~~")) {
-                        val notRealName = siblings.subList(3, siblings.map { it.string }.indexOf(" -> "))
-                            .joinToString("") { it.string }.removePrefix("~~")
-                        addRealNameMessage(siblings, "/realname $notRealName", "Реальный ник $notRealName")
-                    } else {
-                        val name = siblings[3].string
-                        addPunishToMessage(siblings, name)
-                    }
-                } else if (isABannedOrMutedMessage(siblings)) {
-                    val nick = siblings[3].string.trim()
-                    addPunishToMessage(siblings, nick, "§e[П]§r")
-                } else if (isARealName(siblings)) {
-                    val nick = siblings.last().string.trim()
-                    addPunishToMessage(siblings, nick)
-                } else if (isAChatGame(siblings)) {
-                    val exercise = siblings[3].string
-                    addAnswerToMessage(siblings, exercise)
-                } else {
-                    for (text in siblings) {
-                        if (text.style.clickEvent?.action == ClickEvent.Action.SUGGEST_COMMAND &&
-                            text.style.clickEvent?.value?.startsWith("/msg ") == true
-                        ) {
-                            val playerName = text.style.clickEvent!!.value.drop(5).dropLast(1)
-                            addPunishToMessage(siblings, playerName)
-                            break
-                        }
-                    }
+                    return@ModifyGame message
                 }
-                return@ModifyGame fullMessage
-            }
         )
+//        ClientReceiveMessageEvents.MODIFY_GAME.register(
+//            ClientReceiveMessageEvents.ModifyGame { fullMessage, _ ->
+//                if (!settingsFileSource.read().chatsAction) return@ModifyGame fullMessage
+//
+//                val siblings = fullMessage.siblings
+//                if (isAModerCommand(siblings)) {
+//                    val violator = siblings[4].string.trim() // Ник наказавшего
+//                    val nick = siblings[6].string.trim() // Ник потерпевшего
+//                    val punishment = siblings[5].string.trim() // Наказание
+//                    if (punishment.startsWith("кикнул")) {
+//                        addPunishToMessage(siblings, nick)
+//                    } else {
+//                        addPunishToMessage(siblings, nick, "§e[П]§r")
+//                        if (punishment.startsWith("забанил")) {
+//                            addUnToMessage(siblings, "/unban $nick", "Разбанить §c$nick")
+//                        } else if (punishment.startsWith("замутил")) {
+//                            addUnToMessage(siblings, "/unmute $nick", "Размутить §c$nick")
+//                        } else if (punishment.startsWith("выдал предупреждение")) {
+//                            addUnToMessage(siblings, "/unwarn $nick", "Разварнить §c$nick")
+//                        }
+//                        addPunishToMessage(siblings, violator)
+//                    }
+//                } else if (isANearMessage(siblings)) {
+//                    val nicks = siblings.subList(3, siblings.size).map { it.string }
+//                    var nick = ""
+//                    var dropMeters = false
+//                    var nextDrop = false
+//                    var offside = 3
+//                    for ((index, str) in nicks.withIndex()) {
+//                        if (str == "(") {
+//                            if (nick.startsWith("~~")) {
+//                                addRealNameMessage(siblings, "/realname $nick", "Реальный ник $nick", index = index + offside)
+//                                offside++
+//                            } else {
+//                                addPunishToMessage(siblings, nick, index = index + offside)
+//                                offside++
+//                            }
+//                            nick = ""
+//                            dropMeters = true
+//                        } else if (dropMeters) {
+//                            nextDrop = true
+//                            dropMeters = false
+//                            continue
+//                        } else if (nextDrop) {
+//                            nick = str.drop(3)
+//                            nextDrop = false
+//                        } else {
+//                            nick += if (index == 0) str.trim() else str
+//                        }
+//                    }
+//                } else if (isAJailCommand(siblings)) {
+//                    val nick = siblings[4].string.trim() // Пострадавший
+//                    addPunishToMessage(siblings, siblings[2].string.trim())
+//                    addUnToMessage(siblings, "/jail free $nick", "Разджеилить $nick")
+//                    addPunishToMessage(siblings, nick, "§e[П]§r")
+//                } else if (isAnAFKMessage(siblings)) {
+//                    if (siblings[2].string.startsWith("~~")) {
+//                        val notRealName = siblings.subList(2, siblings.size - 1)
+//                            .joinToString("") { it.string }.removePrefix("~~")
+//                        addRealNameMessage(siblings, "/realname $notRealName", "Реальный ник $notRealName")
+//                    } else {
+//                        val realName = siblings[2].string.trim()
+//                        addPunishToMessage(siblings, realName)
+//                    }
+//                } else if (isASocialSpy(siblings)) {
+//                    if (siblings[8].string.startsWith("~~")) {
+//                        val notRealName = siblings.subList(8, siblings.map { it.string }.indexOf(" -> "))
+//                            .joinToString("") { it.string }.removePrefix("~~")
+//                        addRealNameMessage(siblings, "/realname $notRealName", "Реальный ник $notRealName")
+//                    } else {
+//                        val name = siblings[8].string
+//                        addPunishToMessage(siblings, name)
+//                    }
+//                } else if (isAPrivateMessage(siblings)) {
+//                    if (siblings[3].string.startsWith("~~")) {
+//                        val notRealName = siblings.subList(3, siblings.map { it.string }.indexOf(" -> "))
+//                            .joinToString("") { it.string }.removePrefix("~~")
+//                        addRealNameMessage(siblings, "/realname $notRealName", "Реальный ник $notRealName")
+//                    } else {
+//                        val name = siblings[3].string
+//                        addPunishToMessage(siblings, name)
+//                    }
+//                } else if (isABannedOrMutedMessage(siblings)) {
+//                    val nick = siblings[3].string.trim()
+//                    addPunishToMessage(siblings, nick, "§e[П]§r")
+//                } else if (isARealName(siblings)) {
+//                    val nick = siblings.last().string.trim()
+//                    addPunishToMessage(siblings, nick)
+//                } else if (isAChatGame(siblings)) {
+//                    val exercise = siblings[3].string
+//                    addAnswerToMessage(siblings, exercise)
+//                } else {
+//                    for (text in siblings) {
+//                        if (text.style.clickEvent?.action == ClickEvent.Action.SUGGEST_COMMAND &&
+//                            text.style.clickEvent?.value?.startsWith("/msg ") == true
+//                        ) {
+//                            val playerName = text.style.clickEvent!!.value.drop(5).dropLast(1)
+//                            addPunishToMessage(siblings, playerName)
+//                            break
+//                        }
+//                    }
+//                }
+//                return@ModifyGame fullMessage
+//            }
+//        )
 
         val punishmenu = KeyBindingHelper.registerKeyBinding(
             KeyBinding(
