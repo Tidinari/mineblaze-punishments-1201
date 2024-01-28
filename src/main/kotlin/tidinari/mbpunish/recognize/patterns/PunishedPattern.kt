@@ -2,8 +2,8 @@ package tidinari.mbpunish.recognize.patterns
 
 import net.minecraft.text.Text
 import tidinari.mbpunish.recognize.information.BannedInfo
-import tidinari.mbpunish.recognize.information.MessageInfo
 import tidinari.mbpunish.recognize.information.MutedInfo
+import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class PunishedPattern : MessagePattern {
     override fun isMatches(siblings: List<Text>): Boolean {

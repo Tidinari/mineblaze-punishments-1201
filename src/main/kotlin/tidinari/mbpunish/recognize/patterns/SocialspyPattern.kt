@@ -1,8 +1,8 @@
 package tidinari.mbpunish.recognize.patterns
 
 import net.minecraft.text.Text
-import tidinari.mbpunish.recognize.information.MessageInfo
 import tidinari.mbpunish.recognize.information.SocialspyInfo
+import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class SocialspyPattern : MessagePattern {
     override fun isMatches(siblings: List<Text>): Boolean {

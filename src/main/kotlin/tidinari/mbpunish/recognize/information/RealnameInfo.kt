@@ -1,7 +1,5 @@
 package tidinari.mbpunish.recognize.information
 
-class RealnameInfo(val nick: String): MessageInfo {
-    override fun getValues(): List<Any> {
-        return listOf(nick)
-    }
-}
+import tidinari.mbpunish.recognize.information.abstraction.NickInfo
+
+class RealnameInfo(nick: String): NickInfo(nick)

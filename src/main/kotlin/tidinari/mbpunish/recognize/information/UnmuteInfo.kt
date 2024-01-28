@@ -1,7 +1,5 @@
 package tidinari.mbpunish.recognize.information
 
-class UnmuteInfo(val punisher: String, val victim: String): MessageInfo {
-    override fun getValues(): List<Any> {
-        return listOf(punisher, victim)
-    }
-}
+import tidinari.mbpunish.recognize.information.abstraction.ModerInfo
+
+class UnmuteInfo(punisher: String, victim: String): ModerInfo(punisher, victim)

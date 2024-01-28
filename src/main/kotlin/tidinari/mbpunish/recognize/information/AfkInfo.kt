@@ -2,4 +2,4 @@ package tidinari.mbpunish.recognize.information
 
 import tidinari.mbpunish.recognize.information.abstraction.PossibleNickInfo
 
-class SocialspyInfo(nick: String, isReal: Boolean): PossibleNickInfo(nick, isReal)
+class AfkInfo(nick: String, isReal: Boolean): PossibleNickInfo(nick, isReal)

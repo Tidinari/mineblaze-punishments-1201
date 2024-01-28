@@ -3,7 +3,7 @@ package tidinari.mbpunish.recognize
 import net.minecraft.text.Text
 import tidinari.mbpunish.recognize.patterns.MessagePattern
 
-class MessageRecognizer(private val text: Text) {
+class MessageRecognizer {
 
     private val patterns = Patterns.entries.map { it.messagePattern }
 

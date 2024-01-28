@@ -1,8 +1,8 @@
 package tidinari.mbpunish.recognize.patterns
 
 import net.minecraft.text.Text
-import tidinari.mbpunish.recognize.information.MessageInfo
 import tidinari.mbpunish.recognize.information.RealnameInfo
+import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class RealnamePattern : MessagePattern {
     override fun isMatches(siblings: List<Text>): Boolean {
