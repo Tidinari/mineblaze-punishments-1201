@@ -21,8 +21,9 @@ import tidinari.mbpunish.chatpatch.PreventColorcodeAbuse
 import tidinari.mbpunish.commands.PunishCommand
 import tidinari.mbpunish.commands.RealNameAliasCommand
 import tidinari.mbpunish.commands.SendChatCommand
+import tidinari.mbpunish.recognize.menu.MenuChooser
+import tidinari.mbpunish.screens.OneNickMenu
 import tidinari.mbpunish.screens.PunishmentEditMenu
-import tidinari.mbpunish.screens.PunishmentMenu
 import tidinari.mbpunish.sources.replace.ReplaceFileSource
 import tidinari.mbpunish.sources.rules.RulesFileSource
 import tidinari.mbpunish.sources.settings.SettingsFileSource
@@ -30,6 +31,9 @@ import tidinari.mbpunish.sources.settings.SettingsFileSource
 
 object MineBlazePunishments : ModInitializer {
     private val logger = LoggerFactory.getLogger("mineblaze-punishments")
+    val menuChooser: MenuChooser
+        get() = _menuChooser!!
+    private var _menuChooser: MenuChooser? = null
 
     override fun onInitialize() {
         val replacerFileSource = ReplaceFileSource()
@@ -40,6 +44,8 @@ object MineBlazePunishments : ModInitializer {
         rulesFileSource.init()
         val settingsFileSource = SettingsFileSource()
         settingsFileSource.init()
+
+        _menuChooser = MenuChooser(rulesFileSource, settingsFileSource)
 
         ScrollDisableOnFocus(settingsFileSource).handleChat()
         UseEntityCallback.EVENT.register(UseEntityHandler(rulesFileSource, settingsFileSource))
@@ -164,7 +170,7 @@ object MineBlazePunishments : ModInitializer {
         )
         ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick {
             while (punishmenu.wasPressed()) {
-                MinecraftClient.getInstance().setScreen(PunishmentMenu("", rulesFileSource, settingsFileSource))
+                MinecraftClient.getInstance().setScreen(OneNickMenu("", rulesFileSource, settingsFileSource))
             }
         })
 

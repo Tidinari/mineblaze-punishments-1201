@@ -12,7 +12,7 @@ import tidinari.mbpunish.sources.rules.RulesSource
 import tidinari.mbpunish.sources.settings.SettingsSource
 
 
-class PunishmentMenu(player: String, private val rulesSource: RulesSource, private val settingsSource: SettingsSource) : BaseOwoScreen<FlowLayout>() {
+class OneNickMenu(player: String, private val rulesSource: RulesSource, private val settingsSource: SettingsSource) : BaseOwoScreen<FlowLayout>() {
     private val violator = Violator(player)
 
     override fun createAdapter(): OwoUIAdapter<FlowLayout> {
@@ -103,7 +103,7 @@ class PunishmentMenu(player: String, private val rulesSource: RulesSource, priva
 
     private fun rebuildWith(punishmentInRow: Int = 2, rulesInRow: Int = 3) {
         settingsSource.save(settingsSource.read().run { rebuildWithParameters(changedPunishmentsInRow = punishmentInRow, changedRulesInColumn = rulesInRow) })
-        MinecraftClient.getInstance().setScreen(PunishmentMenu(violator.name(), rulesSource, settingsSource))
+        MinecraftClient.getInstance().setScreen(OneNickMenu(violator.name(), rulesSource, settingsSource))
     }
 
     private fun constructRowRulesContainer(): FlowLayout {

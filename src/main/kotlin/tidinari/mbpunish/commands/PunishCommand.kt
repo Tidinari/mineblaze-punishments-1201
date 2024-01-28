@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.MinecraftClient
-import tidinari.mbpunish.screens.PunishmentMenu
+import tidinari.mbpunish.screens.OneNickMenu
 import tidinari.mbpunish.sources.rules.RulesSource
 import tidinari.mbpunish.sources.settings.SettingsSource
 
@@ -64,6 +64,6 @@ class PunishCommand(private val rulesSource: RulesSource, private val settingsSo
     }
 
     private fun open(playerName: String) {
-        MinecraftClient.getInstance().setScreenAndRender(PunishmentMenu(playerName, rulesSource, settingsSource))
+        MinecraftClient.getInstance().setScreenAndRender(OneNickMenu(playerName, rulesSource, settingsSource))
     }
 }
