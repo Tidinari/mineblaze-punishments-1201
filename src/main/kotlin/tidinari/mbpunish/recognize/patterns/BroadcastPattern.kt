@@ -6,7 +6,7 @@ import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class BroadcastPattern: MessagePattern {
     override fun isMatches(siblings: List<Text>): Boolean {
-        return siblings.size >= 7
+        return siblings.size >= 6
                 && siblings[0].string.startsWith("[")
                 && siblings[1].string.startsWith("Объявление")
                 && siblings[2].string.startsWith("]")

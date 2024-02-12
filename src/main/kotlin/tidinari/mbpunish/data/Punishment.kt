@@ -3,6 +3,7 @@ package tidinari.mbpunish.data
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
+import io.wispforest.owo.ui.core.Component
 import io.wispforest.owo.ui.core.Insets
 import io.wispforest.owo.ui.core.Sizing
 import io.wispforest.owo.ui.core.VerticalAlignment
@@ -15,10 +16,13 @@ import tidinari.mbpunish.screens.utils.CorrectTextBox
 @Serializable
 class Punishment(private val name: String, private val command: String) {
 
-    fun component(violator: Violator) = Components.button(Text.literal(name)) { execute(violator) }.margins(Insets.left(3))
+    fun component(violator: Violator) = (Components.button(Text.literal(name)) { execute(violator) } as Component).margins(Insets.left(3))
 
     private fun execute(violator: Violator) {
         val commandToExecute = command.replace("%name%", violator.name())
+        if (violator.name().equals(MinecraftClient.getInstance().session.username, true)) {
+            return
+        }
         if ((violator.name().isBlank() || violator.name().isEmpty()) && commandToExecute != command) {
             return
         }

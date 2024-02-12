@@ -14,6 +14,7 @@ class JailPattern: MessagePattern {
     override fun parseMessage(siblings: List<Text>): MessageInfo {
         val punisher = siblings[2].string.trim()
         val victim = siblings[4].string.trim()
-        return JailInfo(punisher, victim)
+        val punishment = siblings.subList(8, siblings.size).joinToString(separator = "") { it.string }
+        return JailInfo(punisher, victim, punishment)
     }
 }

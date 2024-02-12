@@ -5,23 +5,14 @@ import net.minecraft.text.Text
 import tidinari.mbpunish.recognize.information.ChatInfo
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
-class ChatPattern: MessagePattern {
+class ChatPattern : MessagePattern {
     override fun isMatches(siblings: List<Text>): Boolean {
-        for (text in siblings) {
-            return text.style.clickEvent?.action == ClickEvent.Action.SUGGEST_COMMAND &&
-                    text.style.clickEvent?.value?.startsWith("/msg ") == true
-        }
-        return false
+        return siblings.isNotEmpty() && siblings[0].siblings.isNotEmpty()
+                && siblings[0].style.clickEvent?.action == ClickEvent.Action.SUGGEST_COMMAND
+                && siblings[0].style.clickEvent?.value?.startsWith("/msg ") == true
     }
 
     override fun parseMessage(siblings: List<Text>): MessageInfo {
-        for (text in siblings) {
-            if (text.style.clickEvent?.action == ClickEvent.Action.SUGGEST_COMMAND &&
-                    text.style.clickEvent?.value?.startsWith("/msg ") == true
-            ) {
-                return ChatInfo(text.style.clickEvent!!.value.drop(5).dropLast(1))
-            }
-        }
-        throw IllegalArgumentException()
+        return ChatInfo(siblings[0].style.clickEvent!!.value.drop(5).dropLast(1))
     }
 }

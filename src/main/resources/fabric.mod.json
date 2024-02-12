@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "mineblaze-punishments",
+			"id": "mineblaze-punishments",
 	"version": "${version}",
 	"name": "MineBlaze Punishments",
 	"description": "Добавляет меню для наказаний, алиас /rn",

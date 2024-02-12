@@ -3,16 +3,24 @@ package tidinari.mbpunish.recognize
 import tidinari.mbpunish.recognize.patterns.*
 
 enum class Patterns(val messagePattern: MessagePattern) {
-    AFK(AfkPattern()),
-    BROADCAST(BroadcastPattern()),
     CHAT(ChatPattern()),
+    SOCIALSPY(SocialspyPattern()),
+    CHATGAME(ChatGamePattern()),
+    SPAM(SpamPattern()),
+    AFK(AfkPattern()),
+    JOIN(JoinPattern()),
+    ANTICHEAT(AntiCheatPattern()),
+    BROADCAST(BroadcastPattern()),
     COREPROTECTOR(CoreprotectorPattern()),
-    JAIL(JailPattern()),
+    HISTORY(HistoryPattern()),
+    ADMINCHAT(AdminChatPattern()),
     ME(MePattern()),
     PRIVATE(PrivatePattern()),
     PUNISH(ModerCommandPattern()),
     NEAR(NearPattern()),
     PUNISHED(PunishedPattern()),
     REALNAME(RealnamePattern()),
-    SOCIALSPY(SocialspyPattern())
+    JAIL(JailPattern()),
+    CLEARCHAT(ClearChatPattern()),
+    SAY(SayPattern())
 }

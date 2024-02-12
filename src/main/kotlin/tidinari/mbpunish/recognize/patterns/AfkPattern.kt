@@ -13,7 +13,7 @@ class AfkPattern: MessagePattern {
     }
 
     override fun parseMessage(siblings: List<Text>): MessageInfo {
-        if (siblings[2].string.startsWith(" ~~")) {
+        if (siblings[2].string.startsWith("~~")) {
             val notRealName = siblings.subList(2, siblings.size - 1)
                     .joinToString("") { it.string }.trim()
             return AfkInfo(notRealName, false)

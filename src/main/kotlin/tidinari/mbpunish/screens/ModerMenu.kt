@@ -13,11 +13,9 @@ import tidinari.mbpunish.sources.rules.RulesSource
 import tidinari.mbpunish.sources.settings.SettingsSource
 
 
-class ModerMenu(punisher: String, victim: String, private val rulesSource: RulesSource, private val settingsSource: SettingsSource) : BaseOwoScreen<FlowLayout>() {
+class ModerMenu(punisher: String, victim: String, private val rulesSource: RulesSource, private val settingsSource: SettingsSource, private var selectedPlayer: Int = 0) : BaseOwoScreen<FlowLayout>() {
 
     private val players = listOf(Violator(punisher), Violator(victim))
-    private var selectedPlayer = 0
-
     override fun createAdapter(): OwoUIAdapter<FlowLayout> {
         return OwoUIAdapter.create(this, Containers::verticalFlow);
     }
@@ -29,7 +27,7 @@ class ModerMenu(punisher: String, victim: String, private val rulesSource: Rules
             val settings = settingsSource.read()
 
             // Violator chooser
-            Containers.verticalFlow(Sizing.fill(100), Sizing.fixed(45))
+            child(Containers.verticalFlow(Sizing.fill(100), Sizing.fixed(45))
                     .apply { horizontalAlignment(HorizontalAlignment.CENTER) }
                     .children(listOf(
                             Containers.horizontalFlow(Sizing.content(), Sizing.content())
@@ -38,20 +36,18 @@ class ModerMenu(punisher: String, victim: String, private val rulesSource: Rules
                                             .apply {
                                                 checked(selectedPlayer == 0)
                                             }.onChanged {
-                                                selectedPlayer = if (it) { 0 } else { 1 }
-                                                rebuildWith(settings.punishmentsInRow, settings.rulesInColumn)
-                                            }.margins(Insets.right(5))
+                                                rebuildWith(0, settings.punishmentsInRow, settings.rulesInColumn)
+                                            }
                                     )
-                                    .child(Components.label(Text.literal(players[0].name())).margins(Insets.right(5)))
+                                    .child(Components.button(Text.literal(players[0].name())) { rebuildWith(0, settings.punishmentsInRow, settings.rulesInColumn) }.margins(Insets.right(10)))
+                                    .child(Components.button(Text.literal(players[1].name())) { rebuildWith(1, settings.punishmentsInRow, settings.rulesInColumn) }.margins(Insets.left(10)))
                                     .child(Components.checkbox(Text.literal(""))
                                             .apply {
                                                 checked(selectedPlayer == 1)
                                             }.onChanged {
-                                                selectedPlayer = if (it) { 1 } else { 0 }
-                                                rebuildWith(settings.punishmentsInRow, settings.rulesInColumn)
-                                            }.margins(Insets.right(5))
-                                    )
-                                    .child(Components.label(Text.literal(players[1].name())).margins(Insets.left(5))),
+                                                rebuildWith(1, settings.punishmentsInRow, settings.rulesInColumn)
+                                            }.margins(Insets.left(5))
+                                    ),
                             Containers.horizontalFlow(Sizing.content(), Sizing.content())
                                     .apply { verticalAlignment(VerticalAlignment.CENTER) }
                                     .children(
@@ -67,7 +63,7 @@ class ModerMenu(punisher: String, victim: String, private val rulesSource: Rules
                                                     Punishment("doninfo", "doninfo %name%").component(players[selectedPlayer]),
                                             )
                                     )
-                    ))
+                    )))
 
             // Main container
             val mainContainer = Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(height - 45 - 3 - 50)).apply {
@@ -143,9 +139,9 @@ class ModerMenu(punisher: String, victim: String, private val rulesSource: Rules
         }
     }
 
-    private fun rebuildWith(punishmentInRow: Int = 2, rulesInRow: Int = 3) {
+    private fun rebuildWith(selectedPlayer: Int = 0, punishmentInRow: Int = 2, rulesInRow: Int = 3) {
         settingsSource.save(settingsSource.read().run { rebuildWithParameters(changedPunishmentsInRow = punishmentInRow, changedRulesInColumn = rulesInRow) })
-        MinecraftClient.getInstance().setScreen(ModerMenu(players[0].name(), players[1].name(), rulesSource, settingsSource))
+        MinecraftClient.getInstance().setScreen(ModerMenu(players[0].name(), players[1].name(), rulesSource, settingsSource, selectedPlayer))
     }
 
     private fun constructRowRulesContainer(): FlowLayout {

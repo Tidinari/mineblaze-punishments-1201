@@ -6,11 +6,11 @@ import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class PrivatePattern: MessagePattern {
     override fun isMatches(siblings: List<Text>): Boolean {
-        return siblings.size == 5
-                && siblings[0].string.equals("[")
-                && siblings[1].string.equals("*")
-                && siblings[2].string.equals("] ")
-                && siblings.last().string.startsWith("пытался")
+        return siblings.size >= 6
+                && siblings[0].string.equals("|")
+                && siblings[1].string.equals(" ")
+                && siblings[2].string.equals("[")
+                && !siblings[3].string.equals("SS")
     }
 
     override fun parseMessage(siblings: List<Text>): MessageInfo {
