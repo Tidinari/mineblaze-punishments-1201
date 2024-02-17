@@ -45,19 +45,19 @@ class HistoryPattern: MessagePattern {
             when {
                 +"кикнут" -> {
                     val reason = siblings.subList(7, siblings.size - 2).joinToString(separator = "") { it.string }
-                    return KickInfo(victim, punisher, reason)
+                    return KickInfo(punisher, victim, reason)
                 }
                 +"забанен" -> {
                     val reason = siblings.subList(7, siblings.size - 2).joinToString(separator = "") { it.string }
-                    return BanInfo(victim, punisher, reason)
+                    return BanInfo(punisher, victim, reason)
                 }
                 +"замучен" -> {
                     val reason = siblings.subList(7, siblings.size - 2).joinToString(separator = "") { it.string }
-                    return MuteInfo(victim, punisher, reason)
+                    return MuteInfo(punisher, victim, reason)
                 }
                 +"предупрежден" -> {
                     val reason = siblings.subList(7, siblings.size - 2).joinToString(separator = "") { it.string }
-                    return WarnInfo(victim, punisher, reason)
+                    return WarnInfo(punisher, victim, reason)
                 }
             }
         }

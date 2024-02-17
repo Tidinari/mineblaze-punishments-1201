@@ -12,7 +12,8 @@ import tidinari.mbpunish.sources.rules.RulesSource
 import tidinari.mbpunish.sources.settings.SettingsSource
 
 
-class OneNickMenu(player: String, private val rulesSource: RulesSource, private val settingsSource: SettingsSource) : BaseOwoScreen<FlowLayout>() {
+class OneNickMenu(player: String, private val rulesSource: RulesSource, private val settingsSource: SettingsSource) :
+    BaseOwoScreen<FlowLayout>() {
     private val violator = Violator(player)
 
     override fun createAdapter(): OwoUIAdapter<FlowLayout> {
@@ -40,7 +41,8 @@ class OneNickMenu(player: String, private val rulesSource: RulesSource, private 
             child(bottomContainer)
             // Rules container
             val rulesContainer = Containers.horizontalFlow(Sizing.content(), Sizing.content())
-            val rulesScrollableContainer = Containers.verticalScroll(Sizing.fixed(width - 150 - 9), Sizing.fill(100), rulesContainer)
+            val rulesScrollableContainer =
+                Containers.verticalScroll(Sizing.fixed(width - 150 - 9), Sizing.fill(100), rulesContainer)
             mainContainer.child(rulesScrollableContainer)
             // Additional container
             val additionalContainer = Containers.verticalFlow(Sizing.fixed(150), Sizing.fill(100))
@@ -67,11 +69,23 @@ class OneNickMenu(player: String, private val rulesSource: RulesSource, private 
             // Add additional information
             additionalContainer.child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                 alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                children(listOf(
-                    Components.label(Text.literal("Наказаний в строке: ${settings.punishmentsInRow}")),
-                    Components.button(Text.literal("+")) { rebuildWith(settings.punishmentsInRow + 1, settings.rulesInColumn) },
-                ))
-                val minusPunishment = Components.button(Text.literal("-")) { rebuildWith(settings.punishmentsInRow - 1, settings.rulesInColumn) }
+                children(
+                    listOf(
+                        Components.label(Text.literal("Наказаний в строке: ${settings.punishmentsInRow}")),
+                        Components.button(Text.literal("+")) {
+                            rebuildWith(
+                                settings.punishmentsInRow + 1,
+                                settings.rulesInColumn
+                            )
+                        },
+                    )
+                )
+                val minusPunishment = Components.button(Text.literal("-")) {
+                    rebuildWith(
+                        settings.punishmentsInRow - 1,
+                        settings.rulesInColumn
+                    )
+                }
                 if (settings.punishmentsInRow == 1) {
                     minusPunishment.active(false)
                 }
@@ -81,28 +95,100 @@ class OneNickMenu(player: String, private val rulesSource: RulesSource, private 
                 alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 children(listOf(
                     Components.label(Text.literal("Правил в столбце: ${settings.rulesInColumn}")),
-                    Components.button(Text.literal("+")) { rebuildWith(settings.punishmentsInRow, settings.rulesInColumn + 1) }
+                    Components.button(Text.literal("+")) {
+                        rebuildWith(
+                            settings.punishmentsInRow,
+                            settings.rulesInColumn + 1
+                        )
+                    }
                 ))
-                val minusRules = Components.button(Text.literal("-")) { rebuildWith(settings.punishmentsInRow, settings.rulesInColumn - 1) }
+                val minusRules = Components.button(Text.literal("-")) {
+                    rebuildWith(
+                        settings.punishmentsInRow,
+                        settings.rulesInColumn - 1
+                    )
+                }
                 if (settings.rulesInColumn == 1) {
                     minusRules.active(false)
                 }
                 child(minusRules)
             })
-            additionalContainer.child(Components.checkbox(Text.literal("ПКМ по игроку")).apply { checked(settings.useEntityAction) }.onChanged {
-                settingsSource.save(settings.rebuildWithParameters(changedUseEntityAction = it))
-            })
-            additionalContainer.child(Components.checkbox(Text.literal("Через чат")).apply { checked(settings.chatsAction) }.onChanged {
-                settingsSource.save(settings.rebuildWithParameters(changedChatsAction = it))
-            })
-            additionalContainer.child(Components.checkbox(Text.literal("Фиксация чата при фокусе")).apply { checked(settings.stopChatOnFocus) }.onChanged {
-                settingsSource.save(settings.rebuildWithParameters(changedStopChatOnFocus = it))
-            })
+            additionalContainer.child(
+                Components.checkbox(Text.literal("ПКМ по игроку")).apply { checked(settings.useEntityAction) }
+                    .onChanged {
+                        settingsSource.save(settings.rebuildWithParameters(changedUseEntityAction = it))
+                    })
+            additionalContainer.child(
+                Components.checkbox(Text.literal("Через чат")).apply { checked(settings.chatsAction) }.onChanged {
+                    settingsSource.save(settings.rebuildWithParameters(changedChatsAction = it))
+                })
+            additionalContainer.child(
+                Components.checkbox(Text.literal("Фиксация чата при фокусе"))
+                    .apply { checked(settings.stopChatOnFocus) }.onChanged {
+                        settingsSource.save(settings.rebuildWithParameters(changedStopChatOnFocus = it))
+                    })
+            additionalContainer.child(
+                Components.checkbox(Text.literal("Старое меню для банов/варнов/..")).apply { checked(settings.oldMenu) }
+                    .onChanged {
+                        settingsSource.save(settings.rebuildWithParameters(changedOldMenu = it))
+                    })
+            additionalContainer.child(
+                Components.checkbox(Text.literal("Спам фильтр")).apply { checked(settings.spamFilter) }.onChanged {
+                    settingsSource.save(settings.rebuildWithParameters(changedSpamFilter = it))
+                })
+            additionalContainer.child(
+                Components.checkbox(Text.literal("КолорАбьюз")).apply { checked(settings.disableColorAbuse) }
+                    .onChanged {
+                        settingsSource.save(settings.rebuildWithParameters(changedDisableColorAbuse = it))
+                    })
+
+            additionalContainer.apply {
+                children(listOf(
+                    Components.label(Text.literal("Наказать:")),
+                    Components.textBox(Sizing.fixed(75), settings.punishment).apply {
+                        onChanged().subscribe {
+                            settingsSource.save(settings.rebuildWithParameters(changedPunishment = it))
+                        }
+                    }
+                ))
+
+                children(listOf(
+                    Components.label(Text.literal("Снять:")),
+                    Components.textBox(Sizing.fixed(75), settings.unpunish).apply {
+                        onChanged().subscribe {
+                            settingsSource.save(settings.rebuildWithParameters(changedUnpunish = it))
+                        }
+                    }
+                ))
+
+                children(listOf(
+                    Components.label(Text.literal("Пострадавший:")),
+                    Components.textBox(Sizing.fixed(75), settings.victim).apply {
+                        onChanged().subscribe {
+                            settingsSource.save(settings.rebuildWithParameters(changedVictim = it))
+                        }
+                    }
+                ))
+                children(listOf(
+                    Components.label(Text.literal("Realname:")),
+                    Components.textBox(Sizing.fixed(75), settings.realname).apply {
+                        onChanged().subscribe {
+                            settingsSource.save(settings.rebuildWithParameters(changedRealname = it))
+                        }
+                    }
+                ))
+            }
         }
     }
 
     private fun rebuildWith(punishmentInRow: Int = 2, rulesInRow: Int = 3) {
-        settingsSource.save(settingsSource.read().run { rebuildWithParameters(changedPunishmentsInRow = punishmentInRow, changedRulesInColumn = rulesInRow) })
+        settingsSource.save(
+            settingsSource.read().run {
+                rebuildWithParameters(
+                    changedPunishmentsInRow = punishmentInRow,
+                    changedRulesInColumn = rulesInRow
+                )
+            })
         MinecraftClient.getInstance().setScreen(OneNickMenu(violator.name(), rulesSource, settingsSource))
     }
 

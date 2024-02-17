@@ -32,9 +32,7 @@ class ReplaceFileSource: ReplaceSource {
 
     override fun save(replacerMessages: List<ReplacerMessage>) {
         val config = FabricLoader.getInstance().configDir.resolve("mb-config-replacer.json")
-        println("Saving: $replacerMessages")
         val jsonString = Json.encodeToString(ReplacerPatterns(replacerMessages))
-        println("Saving: $jsonString")
         config.toFile().writeText(jsonString)
     }
 }

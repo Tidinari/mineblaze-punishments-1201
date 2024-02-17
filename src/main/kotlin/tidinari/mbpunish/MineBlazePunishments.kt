@@ -23,7 +23,7 @@ import tidinari.mbpunish.commands.PunishModerCommand
 import tidinari.mbpunish.commands.RealNameAliasCommand
 import tidinari.mbpunish.commands.SendChatCommand
 import tidinari.mbpunish.recognize.MessageRecognizer
-import tidinari.mbpunish.recognize.information.ChatGameInfo
+import tidinari.mbpunish.recognize.information.*
 import tidinari.mbpunish.recognize.information.abstraction.ModerInfo
 import tidinari.mbpunish.recognize.information.abstraction.NickInfo
 import tidinari.mbpunish.recognize.information.abstraction.PossibleNickInfo
@@ -62,9 +62,10 @@ object MineBlazePunishments : ModInitializer {
         PunishModerCommand(rulesFileSource, settingsFileSource).registerCommand()
         RealNameAliasCommand().registerCommand()
         SendChatCommand().registerCommand()
-        PreventColorcodeAbuse().registerListener()
+        PreventColorcodeAbuse(settingsFileSource).registerListener()
         ModerCommandReminder().registerListener()
         ClientReceiveMessageEvents.ALLOW_GAME.register(ClientReceiveMessageEvents.AllowGame { message, _ ->
+            if (!settingsFileSource.read().spamFilter) return@AllowGame true
             if (message.string.trim().isEmpty()) {
                 return@AllowGame false
             }
@@ -79,25 +80,33 @@ object MineBlazePunishments : ModInitializer {
                 val textToAdd = Text.empty()
                 textToAdd.siblings.add(Text.empty())
                 textToAdd.append(fullMessage)
-                if (!settingsFileSource.read().chatsAction) return@ModifyGame textToAdd
+                val settings = settingsFileSource.read()
+                if (!settings.chatsAction) return@ModifyGame textToAdd
                 val siblingsToAdd = textToAdd.siblings[0].siblings
                 try {
                     when (val info = messageRecognizer.recognize(siblings).parseMessage(siblings)) {
-                        is ModerInfo ->
-                            addPunishModerToMessage(siblingsToAdd, info.punisher, info.victim)
+                        is ModerInfo -> {
+                            if (settings.oldMenu) {
+                                addPunishToMessage(siblingsToAdd, info.victim, text = settings.victim)
+                                addUnpunishVictimToMessage(siblingsToAdd, info.victim, info, text = settings.unpunish)
+                                addPunishToMessage(siblingsToAdd, info.punisher, text = settings.punishment)
+                            } else {
+                                addUnpunishVictimToMessage(siblingsToAdd, info.victim, info, text = settings.unpunish)
+                                addPunishModerToMessage(siblingsToAdd, info.punisher, info.victim, text = settings.punishment)
+                            }
+                        }
 
                         is NickInfo ->
-                            addPunishToMessage(siblingsToAdd, info.nick)
+                            addPunishToMessage(siblingsToAdd, info.nick, text = settings.punishment)
 
                         is PossibleNickInfo ->
-                            if (info.isReal) addPunishToMessage(siblingsToAdd, info.nick)
-                            else addRealNameMessage(siblingsToAdd, "/realname ${info.nick}", "Настоящее имя ${info.nick}")
+                            if (info.isReal) addPunishToMessage(siblingsToAdd, info.nick, text = settings.punishment)
+                            else addRealNameMessage(siblingsToAdd, "/realname ${info.nick}", "Настоящее имя ${info.nick}", text = settings.realname)
 
                         is ChatGameInfo ->
                             addAnswerToMessage(siblingsToAdd, info.answer)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } catch (_: Exception) {
                 }
                 return@ModifyGame textToAdd
             }
@@ -146,9 +155,9 @@ object MineBlazePunishments : ModInitializer {
         })
     }
 
-    private fun addRealNameMessage(siblings: MutableList<Text>, command: String, desc: String, index: Int = 0) {
+    private fun addRealNameMessage(siblings: MutableList<Text>, command: String, desc: String, index: Int = 0, text: String = "§3[R]") {
         siblings.add(
-            index, Text.literal("§3[R]§r").setStyle(
+            index, Text.literal(text).setStyle(
                 Style.EMPTY.withClickEvent(
                     ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
@@ -194,6 +203,32 @@ object MineBlazePunishments : ModInitializer {
                     HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
                         Text.literal("Наказать §c$punisher -> $victim")
+                    )
+                )
+            )
+        )
+    }
+
+    private fun addUnpunishVictimToMessage(siblings: MutableList<Text>, victim: String, info: ModerInfo, text: String = "§c[Н]§r") {
+        val command = when (info) {
+            is BanInfo -> "/unban $victim"
+            is WarnInfo -> "/unwarn $victim"
+            is MuteInfo -> "/unmute $victim"
+            is JailInfo -> "/jail free $victim"
+            else -> ""
+        }
+        if (command == "") return
+        siblings.add(
+            0, Text.literal(text).setStyle(
+                Style.EMPTY.withClickEvent(
+                    ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        command
+                    )
+                ).withHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        Text.literal("Исполнить $command")
                     )
                 )
             )

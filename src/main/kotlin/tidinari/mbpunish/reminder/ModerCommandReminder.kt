@@ -41,21 +41,11 @@ class ModerCommandReminder {
                             return@Game
                         }
                         if (info is MoreModerInfo) {
-                            val numbers = info.reason.filter { it.isDigit() }.ifEmpty { "0" }.toInt()
-                            println("Наказание: ${info.reason}, числа: $numbers | ${timer.entries.joinToString { "${it.key.reason} - ${it.value.epochSeconds}  | NOW -> ${Clock.System.now()}"}}")
-                            if (info.reason.contains("Причина не указана")
-                                    || (info.reason.length in 2..8
-                                            && !(numbers in 41..49
-                                            || numbers in 410..424
-                                            || numbers == 4613
-                                            || numbers == 4615))) {
-                                println("Наказание: ${info.reason}, числа: $numbers | ${timer.entries.joinToString { "${it.key.reason} - ${it.value.epochSeconds}  | NOW -> ${Clock.System.now()}"}}")
+                            if (info.reason.contains("Причина не указана")) {
                                 timer[info] = Clock.System.now().plus(20, DateTimeUnit.SECOND)
                             }
                         }
-                    } catch (e: IllegalArgumentException) {
-                        println(message.siblings.last().siblings)
-                        e.printStackTrace()
+                    } catch (_: IllegalArgumentException) {
                     }
                 }
         )

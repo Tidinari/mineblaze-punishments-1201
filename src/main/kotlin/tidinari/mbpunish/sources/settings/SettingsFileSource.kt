@@ -10,6 +10,8 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 class SettingsFileSource: SettingsSource {
+    private var instance: Settings? = null
+
     override fun init() {
         val config = FabricLoader.getInstance().configDir.resolve("mb-menu-settings.json")
         if (!config.exists()) {
@@ -23,14 +25,20 @@ class SettingsFileSource: SettingsSource {
     }
 
     override fun read(): Settings {
-        val config = FabricLoader.getInstance().configDir.resolve("mb-menu-settings.json")
-        val jsonString = config.readText()
-        return Json.decodeFromString<Settings>(jsonString)
+        if (instance == null) {
+            val config = FabricLoader.getInstance().configDir.resolve("mb-menu-settings.json")
+            val jsonString = config.readText()
+            instance = Json.decodeFromString<Settings>(jsonString)
+            return instance!!
+        } else {
+            return instance!!
+        }
     }
 
     override fun save(settings: Settings) {
         val config = FabricLoader.getInstance().configDir.resolve("mb-menu-settings.json")
         val jsonString = Json.encodeToString(settings)
         config.toFile().writeText(jsonString)
+        instance = settings
     }
 }
