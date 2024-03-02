@@ -57,10 +57,6 @@ class Rule(private val name: String, private val description: String, private va
 
     private fun nameComp(showDesc: (String, String) -> Unit) = Components
             .label(Text.literal(name)).apply {
-                textClickHandler {
-                    showDesc(name, description)
-                    return@textClickHandler true
-                }
                 margins(Insets.left(7).withRight(3))
             }
 
