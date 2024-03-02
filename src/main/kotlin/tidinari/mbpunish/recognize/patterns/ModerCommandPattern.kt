@@ -5,7 +5,7 @@ import tidinari.mbpunish.recognize.information.*
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 open class ModerCommandPattern : MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         if (siblings.size >= 7) {
             if (siblings[0].string.startsWith("[")
                     && siblings[1].string.startsWith("*")
@@ -31,7 +31,7 @@ open class ModerCommandPattern : MessagePattern {
         return false
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         val isHide = siblings[0].string.startsWith("[Скрыт]")
         val startIndex = if (isHide) 5 else 4
 

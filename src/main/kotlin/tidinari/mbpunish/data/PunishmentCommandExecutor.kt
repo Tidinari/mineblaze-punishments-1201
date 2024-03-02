@@ -14,11 +14,11 @@ import net.minecraft.text.Text
 import tidinari.mbpunish.screens.utils.CorrectTextBox
 
 @Serializable
-class Punishment(private val name: String, private val command: String) {
+class PunishmentCommandExecutor(private val name: String, private val command: String): CommandExecutor {
 
-    fun component(violator: Violator) = (Components.button(Text.literal(name)) { execute(violator) } as Component).margins(Insets.left(3))
+    override fun component(violator: Violator) = (Components.button(Text.literal(name)) { execute(violator) } as Component).margins(Insets.left(3))
 
-    private fun execute(violator: Violator) {
+    override fun execute(violator: Violator) {
         val commandToExecute = command.replace("%name%", violator.name())
         if (violator.name().equals(MinecraftClient.getInstance().session.username, true)) {
             return
@@ -87,7 +87,7 @@ class EditablePunishment {
         return name.isNotBlank() && command.isNotBlank()
     }
 
-    fun asNormalPunishment(): Punishment {
-        return Punishment(name, command)
+    fun asNormalPunishment(): PunishmentCommandExecutor {
+        return PunishmentCommandExecutor(name, command)
     }
 }

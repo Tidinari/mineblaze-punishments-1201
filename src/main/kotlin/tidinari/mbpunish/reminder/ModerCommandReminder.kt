@@ -33,10 +33,10 @@ class ModerCommandReminder {
                     if (message.siblings.isEmpty()) return@Game
                     val siblings = message.siblings.last().siblings
                     try {
-                        val info = if (moderCommandPattern.isMatches(siblings)) {
-                            moderCommandPattern.parseMessage(siblings)
-                        } else if (jailPattern.isMatches(siblings)) {
-                            jailPattern.parseMessage(siblings)
+                        val info = if (moderCommandPattern.isMatches(message, siblings)) {
+                            moderCommandPattern.parseMessage(message, siblings)
+                        } else if (jailPattern.isMatches(message, siblings)) {
+                            jailPattern.parseMessage(message, siblings)
                         } else {
                             return@Game
                         }

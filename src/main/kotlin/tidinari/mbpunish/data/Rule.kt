@@ -13,7 +13,7 @@ import net.minecraft.text.Text
 import tidinari.mbpunish.screens.utils.CorrectTextBox
 
 @Serializable
-class Rule(private val name: String, private val description: String, private val punishments: List<Punishment>) {
+class Rule(private val name: String, private val description: String, private val punishments: List<PunishmentCommandExecutor>) {
 
     fun display(root: FlowLayout, violator: Violator, punishmentsInARow: Int = 2, showDesc: (String, String) -> Unit) {
         root.children(
@@ -69,7 +69,7 @@ class Rule(private val name: String, private val description: String, private va
     }
 }
 
-class EditableRule(name: String, description: String, punishments: List<Punishment>) {
+class EditableRule(name: String, description: String, punishments: List<PunishmentCommandExecutor>) {
     private val name
         get() = nameBox.text()
     private val description
@@ -123,11 +123,11 @@ class EditableRule(name: String, description: String, punishments: List<Punishme
                 child(Components.button(Text.literal("✚")) {
                     try {
                         if (punishments.last().isNotBlank()) {
-                            punishments.add(Punishment("", "").asEditable())
+                            punishments.add(PunishmentCommandExecutor("", "").asEditable())
                             onAddingPunishment()
                         }
                     } catch (_: NoSuchElementException) {
-                        punishments.add(Punishment("", "").asEditable())
+                        punishments.add(PunishmentCommandExecutor("", "").asEditable())
                         onAddingPunishment()
                     }
                 })

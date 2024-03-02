@@ -66,17 +66,16 @@ object MineBlazePunishments : ModInitializer {
         ModerCommandReminder().registerListener()
         ClientReceiveMessageEvents.ALLOW_GAME.register(ClientReceiveMessageEvents.AllowGame { message, _ ->
             if (!settingsFileSource.read().spamFilter) return@AllowGame true
-            if (message.string.trim().isEmpty()) {
-                return@AllowGame false
+            if (SpamPattern().isMatches(message, message.siblings)) {
+                return@AllowGame message.content.toString() != "empty"
             }
-            !SpamPattern().isMatches(message.siblings)
+            return@AllowGame true
         })
 
         val messageRecognizer = MessageRecognizer()
 
         ClientReceiveMessageEvents.MODIFY_GAME.register(
             ClientReceiveMessageEvents.ModifyGame { fullMessage, _ ->
-                val siblings = fullMessage.siblings
                 val textToAdd = Text.empty()
                 textToAdd.siblings.add(Text.empty())
                 textToAdd.append(fullMessage)
@@ -84,7 +83,11 @@ object MineBlazePunishments : ModInitializer {
                 if (!settings.chatsAction) return@ModifyGame textToAdd
                 val siblingsToAdd = textToAdd.siblings[0].siblings
                 try {
-                    when (val info = messageRecognizer.recognize(siblings).parseMessage(siblings)) {
+                    val parser = messageRecognizer.recognizeOnMessageEvent(fullMessage)
+                    if (parser is SpamPattern) {
+                        return@ModifyGame textToAdd
+                    }
+                    when (val info = parser.parseMessage(fullMessage, fullMessage.siblings)) {
                         is ModerInfo -> {
                             if (settings.oldMenu) {
                                 addPunishToMessage(siblingsToAdd, info.victim, text = settings.victim)
@@ -107,6 +110,7 @@ object MineBlazePunishments : ModInitializer {
                             addAnswerToMessage(siblingsToAdd, info.answer)
                     }
                 } catch (_: Exception) {
+                    println("[EXCEPTION ON MESSAGE, BUT SHOWN] ${fullMessage.siblings}")
                 }
                 return@ModifyGame textToAdd
             }

@@ -5,7 +5,7 @@ import tidinari.mbpunish.recognize.information.*
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class HistoryPattern: MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         // PUNISH
         if (siblings.size >= 9) {
             if (siblings[0].string.equals("- ")) {
@@ -26,7 +26,7 @@ class HistoryPattern: MessagePattern {
         return false
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         if (siblings.size == 5) {
             val punisher = siblings[3].string.trim() // Ник наказавшего
             val victim = siblings[1].string.trim() // Ник того, у кого сняли наказание

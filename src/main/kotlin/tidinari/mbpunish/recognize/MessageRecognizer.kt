@@ -9,19 +9,39 @@ class MessageRecognizer {
 
     private val patterns = Patterns.entries.map { it.messagePattern }
 
+    /**
+     * Recognize text from hud
+     */
     fun recognize(message: Text): MessagePattern {
         val siblings = message.siblings.last().siblings.drop(1)
         patterns.forEach {
-            if (it.isMatches(siblings[0].siblings)) {
+            if (it.isMatches(message, siblings[0].siblings)) {
                 return it
             }
         }
         throw NotImplementedException()
     }
 
-    fun recognize(siblings: List<Text>): MessagePattern {
+    /**
+     * Recognize text from hud
+     */
+    fun recognizeHud(message: Text): MessagePattern {
+        val siblings = message.siblings.last().siblings.drop(1)
         patterns.forEach {
-            if (it.isMatches(siblings)) {
+            if (it.isMatches(message, siblings[0].siblings)) {
+                return it
+            }
+        }
+        throw NotImplementedException()
+    }
+
+    /**
+     * Recognize text from event
+     */
+    fun recognizeOnMessageEvent(message: Text): MessagePattern {
+        val siblings = message.siblings
+        patterns.forEach {
+            if (it.isMatches(message, siblings)) {
                 return it
             }
         }
@@ -30,6 +50,6 @@ class MessageRecognizer {
 
     fun parseMessage(message: Text, messagePattern: MessagePattern): MessageInfo {
         val siblings = message.siblings.last().siblings.drop(1)
-        return messagePattern.parseMessage(siblings[0].siblings)
+        return messagePattern.parseMessage(message, siblings[0].siblings)
     }
 }

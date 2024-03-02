@@ -6,7 +6,7 @@ import tidinari.mbpunish.recognize.information.MutedInfo
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class PunishedPattern : MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         return siblings.size == 5
                 && siblings[0].string.equals("[")
                 && siblings[1].string.equals("*")
@@ -14,7 +14,7 @@ class PunishedPattern : MessagePattern {
                 && siblings.last().string.startsWith("пытался")
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         val nick = siblings[3].string.trim()
         when {
             siblings.last().string.contains("написать") -> return MutedInfo(nick)

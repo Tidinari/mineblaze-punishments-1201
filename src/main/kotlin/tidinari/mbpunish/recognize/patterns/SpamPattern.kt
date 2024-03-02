@@ -5,10 +5,10 @@ import net.minecraft.text.Text
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class SpamPattern : MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         val message = siblings.joinToString("") { it.string }
-        return message.startsWith(".")
-                || !message.any { it.isLetterOrDigit() }
+        return message == "."
+                || (!message.any { it.isLetterOrDigit() } && !siblings.any { it.style.clickEvent?.value?.isNotEmpty() == true || it.style.hoverEvent != null })
                 || (siblings.size >= 2
                 && ((siblings[0].string.startsWith("            ") && siblings[1].string.startsWith("Донат покупать на сайте "))
                 || (siblings[0].string.startsWith("                  ") && siblings[1].string.startsWith("Донат навсегда и после вайпа сохраняется!"))
@@ -21,7 +21,7 @@ class SpamPattern : MessagePattern {
                 || (siblings[0].string.startsWith("| ") && siblings[1].string.equals("Игрок ") && siblings[3].string.equals(" выбил "))))
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         throw NotImplementedException("Spam doesn't have anything to show")
     }
 }

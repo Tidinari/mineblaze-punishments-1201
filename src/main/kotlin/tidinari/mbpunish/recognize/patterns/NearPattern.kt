@@ -1,17 +1,17 @@
 package tidinari.mbpunish.recognize.patterns
 
 import net.minecraft.text.Text
-import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 import tidinari.mbpunish.recognize.information.NearInfo
+import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class NearPattern: MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         return siblings.size > 4
                 && siblings[0].string.equals("| ")
                 && siblings[1].string.equals("Окружающие игроки: ")
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         val nicks = siblings.subList(3, siblings.size).map { it.string }
         var nick = ""
         var dropMeters = false

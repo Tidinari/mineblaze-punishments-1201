@@ -5,7 +5,7 @@ import tidinari.mbpunish.recognize.information.BroadcastInfo
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class BroadcastPattern: MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         return siblings.size >= 6
                 && siblings[0].string.startsWith("[")
                 && siblings[1].string.startsWith("Объявление")
@@ -14,7 +14,7 @@ class BroadcastPattern: MessagePattern {
                 && siblings[siblings.size - 1].string.startsWith(")")
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         return BroadcastInfo(siblings[siblings.size - 2].string.trim())
     }
 }

@@ -4,6 +4,6 @@ import net.minecraft.text.Text
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 interface MessagePattern {
-    fun isMatches(siblings: List<Text>): Boolean
-    fun parseMessage(siblings: List<Text>): MessageInfo
+    fun isMatches(message: Text, siblings: List<Text>): Boolean
+    fun parseMessage(message: Text, siblings: List<Text>): MessageInfo
 }

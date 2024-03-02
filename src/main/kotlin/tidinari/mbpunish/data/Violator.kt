@@ -30,15 +30,15 @@ class Violator(name: String) {
                         .apply { verticalAlignment(VerticalAlignment.CENTER) }
                         .children(
                             listOf(
-                                Punishment("homes", "home %name%:").component(this),
-                                Punishment("rg list", "rg list -p %name%").component(this),
-                                Punishment("shist", "shist %name%").component(this),
-                                Punishment("hist", "hist %name%").component(this),
-                                Punishment("alts", "alts %name%").component(this),
-                                Punishment("unmute", "unmute %name%").component(this),
-                                Punishment("unwarn", "unwarn %name%").component(this),
-                                Punishment("unban", "unban %name%").component(this),
-                                Punishment("doninfo", "doninfo %name%").component(this),
+                                UnsafeCommandExecutor("homes", "home %name%:").component(this),
+                                UnsafeCommandExecutor("rg list", "rg list -p %name%").component(this),
+                                UnsafeCommandExecutor("shist", "shist %name%").component(this),
+                                UnsafeCommandExecutor("hist", "hist %name%").component(this),
+                                UnsafeCommandExecutor("alts", "alts %name%").component(this),
+                                UnsafeCommandExecutor("unmute", "unmute %name%").component(this),
+                                UnsafeCommandExecutor("unwarn", "unwarn %name%").component(this),
+                                UnsafeCommandExecutor("unban", "unban %name%").component(this),
+                                UnsafeCommandExecutor("doninfo", "doninfo %name%").component(this),
                             )
                         )
                 ))

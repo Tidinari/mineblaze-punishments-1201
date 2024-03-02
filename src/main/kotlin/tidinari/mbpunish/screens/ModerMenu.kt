@@ -7,7 +7,7 @@ import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.Text
-import tidinari.mbpunish.data.Punishment
+import tidinari.mbpunish.data.UnsafeCommandExecutor
 import tidinari.mbpunish.data.Violator
 import tidinari.mbpunish.sources.rules.RulesSource
 import tidinari.mbpunish.sources.settings.SettingsSource
@@ -70,15 +70,15 @@ class ModerMenu(
                         .apply { verticalAlignment(VerticalAlignment.CENTER) }
                         .children(
                             listOf(
-                                Punishment("homes", "home %name%:").component(players[selectedPlayer]),
-                                Punishment("rg list", "rg list -p %name%").component(players[selectedPlayer]),
-                                Punishment("shist", "shist %name%").component(players[selectedPlayer]),
-                                Punishment("hist", "hist %name%").component(players[selectedPlayer]),
-                                Punishment("alts", "alts %name%").component(players[selectedPlayer]),
-                                Punishment("unmute", "unmute %name%").component(players[selectedPlayer]),
-                                Punishment("unwarn", "unwarn %name%").component(players[selectedPlayer]),
-                                Punishment("unban", "unban %name%").component(players[selectedPlayer]),
-                                Punishment("doninfo", "doninfo %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("homes", "home %name%:").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("rg list", "rg list -p %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("shist", "shist %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("hist", "hist %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("alts", "alts %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("unmute", "unmute %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("unwarn", "unwarn %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("unban", "unban %name%").component(players[selectedPlayer]),
+                                UnsafeCommandExecutor("doninfo", "doninfo %name%").component(players[selectedPlayer]),
                             )
                         )
                 )))

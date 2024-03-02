@@ -5,14 +5,14 @@ import tidinari.mbpunish.recognize.information.PrivateInfo
 import tidinari.mbpunish.recognize.information.abstraction.MessageInfo
 
 class AdminChatPattern: MessagePattern {
-    override fun isMatches(siblings: List<Text>): Boolean {
+    override fun isMatches(message: Text, siblings: List<Text>): Boolean {
         return siblings.size >= 2
                 && siblings[0].string.equals("|")
                 && siblings[1].string.equals(" ")
                 && siblings[2].string.equals("[Админ-Чат]")
     }
 
-    override fun parseMessage(siblings: List<Text>): MessageInfo {
+    override fun parseMessage(message: Text, siblings: List<Text>): MessageInfo {
         if (siblings[4].string.startsWith("~~")) {
             val text = siblings.map { it.string }
             val end = text.indexOf(":")
