@@ -12,6 +12,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 class RulesFileSource: RulesSource {
+    private var rules: List<Rule>? = null
 
     override fun init() {
         val config = FabricLoader.getInstance().configDir.resolve("mb-config.json")
@@ -26,14 +27,19 @@ class RulesFileSource: RulesSource {
     }
 
     override fun read(): List<Rule> {
-        val config = FabricLoader.getInstance().configDir.resolve("mb-config.json")
-        val jsonString = config.readText()
-        return Json.decodeFromString<Rules>(jsonString).rules
+        if (rules == null) {
+            val config = FabricLoader.getInstance().configDir.resolve("mb-config.json")
+            val jsonString = config.readText()
+            rules = Json.decodeFromString<Rules>(jsonString).rules
+        }
+        return rules!!
     }
 
     override fun save(rules: EditableRules) {
         val config = FabricLoader.getInstance().configDir.resolve("mb-config.json")
-        val jsonString = Json.encodeToString(rules.asNormalRules())
+        val normalRules = rules.asNormalRules()
+        val jsonString = Json.encodeToString(normalRules)
         config.toFile().writeText(jsonString)
+        this.rules = normalRules.rules
     }
 }

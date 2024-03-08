@@ -11,6 +11,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 class ReplaceFileSource: ReplaceSource {
+    private var replacerMessages: List<ReplacerMessage>? = null
 
     override fun init() {
         val config = FabricLoader.getInstance().configDir.resolve("mb-config-replacer.json")
@@ -25,14 +26,18 @@ class ReplaceFileSource: ReplaceSource {
     }
 
     override fun read(): List<ReplacerMessage> {
-        val config = FabricLoader.getInstance().configDir.resolve("mb-config-replacer.json")
-        val jsonString = config.readText()
-        return Json.decodeFromString<ReplacerPatterns>(jsonString).replaciests
+        if (replacerMessages == null) {
+            val config = FabricLoader.getInstance().configDir.resolve("mb-config-replacer.json")
+            val jsonString = config.readText()
+            replacerMessages = Json.decodeFromString<ReplacerPatterns>(jsonString).replaciests
+        }
+        return replacerMessages!!
     }
 
     override fun save(replacerMessages: List<ReplacerMessage>) {
         val config = FabricLoader.getInstance().configDir.resolve("mb-config-replacer.json")
         val jsonString = Json.encodeToString(ReplacerPatterns(replacerMessages))
         config.toFile().writeText(jsonString)
+        this.replacerMessages = replacerMessages
     }
 }
